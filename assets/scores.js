@@ -1,24 +1,24 @@
-// variables
-var highscores = document.querySelector('#highScore')
-var clear = document.querySelector('#clear')
-var goBack = document.querySelector('#goBack')
-// clears score
-clear.addEventListener('click', function () {
-   localStorage.clear();
-   location.reload();
+//get scores
+function printHighscores() {
+  var highscores = JSON.parse(window.localStorage.getItem("highscores")) || [];
+ 
+  highscores.sort(function (a, b) {
+   return b.score - a.score;
 });
-var allScores= localStorage.getItem('allScores')
-allScores = JSON.parse(allScores);
+highscores.array.forEach(function (score) {
+   //create list for scores
+   var liTags = document.createElement("li");
+    liTags.textContent = score.initials + " - " + score.score;
 
-if (allScores !== null) {
-       
-   for (i = 0; i < allScores.length; i++) {
-      var newLi =document.createElement("li");
-      newLi.textContent = allScores[i].initials + " " + allScores[i].score;
-      highscores.appendChild(newLi)
-
-   }
+    var olEl = document.getElementById("highscores");
+    olEl.appendChild(liTags);
+  });
 }
-goBack.addEventListener("click", function (){
-   window.location.replace("./index.html");
-});
+function clearHighscores() {
+window,localStorage.removeItem("highscores");
+window.location.reload();
+}
+
+document.getElementById("clear").onclick = clearHighscores;
+
+printHighscores()
