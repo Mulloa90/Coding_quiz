@@ -1,0 +1,17 @@
+.highscore {
+display: grid;
+grid-template-columns: 1fr 1fr;
+width: 300px;
+font-family:"";
+}
+
+.highscore__name {
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+.highscore__score {
+padding: 10px;
+text-align: center;
+
+}
+.highscore__name-one{}

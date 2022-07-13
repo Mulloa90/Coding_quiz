@@ -1,199 +1,352 @@
-const questions = [
-  {
-      question: "Whats Mario's favorite color ?",
-      optionA: "Blue",
-      optionB: "Red",
-      optionC: "Green",
-      optionD: "Yellow",
-      correctOption: "OptionB"
-  },
+// TODO: add game logic
+// variables to keep track of quiz state
+var currQuestionIndex = 0;
+var time = questions.length * 15;
+var timerId;
+//var q = 0;
 
-  {
-      question: "What is Mario's favorite Basketeball Team?",
-      optionA: "Blazers",
-      optionB: "Lakers",
-      optionC: "Knicks",
-      optionD: "Jazz",
-      correctOption: "optionB"
-  },
+// variables to reference DOM elements
+var questionsEl = document.getElementById("questions");
+var timerEl = document.getElementById("time");
+var choicesEl = document.getElementById("choices");
+var submitBtn = document.getElementById("submit");
+var startBtn = document.getElementById("start");
+var initialsEl = document.getElementById("initials");
+var feedbackEl = document.getElementById("feedback");
 
-  {
-      question: "Where was Mario born",
-      optionA: "Oceanside",
-      optionB: "Chula Vista",
-      optionC: "Poway",
-      optionD: "San Diego",
-      correctOption: "optionD"
-  },
+// sound effects
+var sfxRight = new Audio("assets/sfx/correct.wav");
+var sfxWrong = new Audio("assets/sfx/incorrect.wav");
 
-  {
-      question: "Whats Mario's Favorite food?",
-      optionA: "Taco Shop",
-      optionB: "Italian",
-      optionC: "Wings",
-      optionD: "Thai",
-      correctOption: "optionC"
-  },
+function startQuiz() {
+    
+  // hide start screen
+  var startScreenEl = document.getElementById("start-screen");
+  startScreenEl.setAttribute("class", "hide");
 
-]
+  // un-hide questions section
+  questionsEl.removeAttribute("class");
 
+  // start timer
+  timerId = setInterval(clockTick, 1000);
 
-let shuffledQuestions = [] //empty array to hold shuffled selected questions out of all available questions
+  // show starting time
+  timerEl.textContent = time;
 
-function handleQuestions() { 
-  //function to shuffle and push 10 questions to shuffledQuestions array
-//app would be dealing with 10questions per session
-  while (shuffledQuestions.length <= 9) {
-      const random = questions[Math.floor(Math.random() * questions.length)]
-      if (!shuffledQuestions.includes(random)) {
-          shuffledQuestions.push(random)
-      }
+  console.log(questions.length);
+  if(timerId > 0 || questions.length > 0){
+   console.log(questions);
+  //clear choices
+  currQuestionIndex++;
+    getQ(currQuestionIndex);
+  return;
+  } else {
+   quizEnd();
+ }
+}
+startBtn.addEventListener('click',startQuiz);
+var currQuestion;
+var answer;
+function getQ(currQuestIndex) {
+    while (choicesEl.firstChild) {
+        choicesEl.removeChild(choicesEl.firstChild);
+    }
+    var titleEl = document.getElementById("question-title");
+    currQuestion = questions[currQuestIndex];
+    titleEl.textContent = currQuestion.title;
+    answer = currQuestion.answer;
+    console.log(answer);
+    currQuestion.choices.forEach(function(choice, i) {
+        var myNewOption = document.createElement('button');
+        myNewOption.textContent = i + 1 + ". " + choice;
+        myNewOption.value = choice;
+        choicesEl.appendChild(myNewOption);
+        myNewOption.addEventListener('click',questionClick);
+        currentQuestionIndex = currQuestIndex;
+        console.log(this.textContent);
+    });
+    questions.length = questions.length - 1;
+    
+    var questions = [
+      {
+        questionText: "What is Mario's favorite color?",
+        options: {
+          a: "blue",
+          b: "Red",
+          c: "yellow",
+          d: "green",
+        },
+        correctAnswer: "b",
+      },
+      {
+        questionText: "What is Mario's favorite food",
+        options: {
+          a: "italian",
+          b: "Mexican",
+          c: "Chinese",
+          d: "Thai",
+        },
+        correctAnswer: "a",
+      },
+      {
+        questionText: "What Mario's favorite cocktail",
+        options: {
+          a: "cosmopolitan",
+          b: "AMF",
+          c: "Long island iced tea",
+          d: "lemondrop",
+        },
+        correctAnswer: "b",
+      },
+    ];
+    
+    
+}
+
+function questionClick(e) {
+    //console.log(e.target.value);
+    if(e.target.value === answer && questions.length <= 0){
+        console.log('Correct! Play again!');
+        feedbackEl.textContent = 'Game Over!';
+        endQuiz();
+    }else if(e.target.value === answer){
+        console.log('Correct!');
+        getQ(currentQuestionIndex + 1);
+    }else if(e.target.value !== answer && questions.length > 0){
+        console.log('Wrong!');
+        time = time - 10;
+        getQ(currentQuestionIndex + 1);
+    }else if(e.target.value !== answer && questions.length <= 0){
+        console.log('Wrong!');
+        feedbackEl.textContent = 'Game Over!';
+        endQuiz();
+    }else{
+        console.log('end game');
+    }
+}
+
+function endQuiz() {
+    time = 0;
+    clearInterval(timerId);
+    timerEl.textContent = 0;
+    console.log('Game over');
+}
+
+function clockTick() {
+  time--;
+  timerEl.textContent = time;
+  
+  // check if user ran out of time
+  if (time <= 0) {
+    endQuiz();
+    time = 0;
+    feedbackEl.textContent = 'Time up! Game Over!';
   }
 }
 
+function saveHighscore() {
+      // get value of input box
+  var initials = initialsEl.value.trim();
 
-let questionNumber = 1 //holds the current question number
-let playerScore = 0  //holds the player score
-let wrongAttempt = 0 //amount of wrong answers picked by player
-let indexNumber = 0 //will be used in displaying next question
+  // make sure value wasn't empty
+  if (initials !== "") {
+    // get saved scores from localstorage, or if not any, set to empty array
+    var highscores =
+      JSON.parse(window.localStorage.getItem("highscores")) || [];
 
-// function for displaying next question in the array to dom
-//also handles displaying players and quiz information to dom
-function NextQuestion(index) {
-  handleQuestions()
-  const currentQuestion = shuffledQuestions[index]
-  document.getElementById("question-number").innerHTML = questionNumber
-  document.getElementById("player-score").innerHTML = playerScore
-  document.getElementById("display-question").innerHTML = currentQuestion.question;
-  document.getElementById("option-one-label").innerHTML = currentQuestion.optionA;
-  document.getElementById("option-two-label").innerHTML = currentQuestion.optionB;
-  document.getElementById("option-three-label").innerHTML = currentQuestion.optionC;
-  document.getElementById("option-four-label").innerHTML = currentQuestion.optionD;
+    // format new score object for current user
+    var newScore = {
+      score: time,
+      initials: initials
+    };
 
+    // save to localstorage
+    highscores.push(newScore);
+    window.localStorage.setItem("highscores", JSON.stringify(highscores));
+
+    // redirect to next page
+    window.location.href = "highscores.html";
+  }
 }
 
+function checkForEnter(event) {
+}
 
-function checkForAnswer() {
-  const currentQuestion = shuffledQuestions[indexNumber] //gets current Question 
-  const currentQuestionAnswer = currentQuestion.correctOption //gets current Question's answer
-  const options = document.getElementsByName("option"); //gets all elements in dom with name of 'option' (in this the radio inputs)
-  let correctOption = null
+// user clicks button to submit initials
+submitBtn.onclick = saveHighscore;
 
-  options.forEach((option) => {
-      if (option.value === currentQuestionAnswer) {
-          //get's correct's radio input with correct answer
-          correctOption = option.labels[0].id
-      }
-  })
+//user clicks button to start quiz
+startBtn.onclick = startQuiz;
 
-  //checking to make sure a radio input has been checked or an option being chosen
-  if (options[0].checked === false && options[1].checked === false && options[2].checked === false && options[3].checked == false) {
-      document.getElementById('option-modal').style.display = "flex"
+initialsEl.onkeyup = checkForEnter;
+
+// variables to keep track of quiz state
+var currentQuestionIndex = 0;
+var time = questions.length * 15;
+var timerId;
+
+// variables to reference DOM elements
+var questionsEl = document.getElementById("questions");
+var timerEl = document.getElementById("time");
+var choicesEl = document.getElementById("choices");
+var submitBtn = document.getElementById("submit");
+var startBtn = document.getElementById("start");
+var initialsEl = document.getElementById("initials");
+var feedbackEl = document.getElementById("feedback");
+
+// sound effects
+var sfxRight = new Audio("assets/sfx/correct.wav");
+var sfxWrong = new Audio("assets/sfx/incorrect.wav");
+
+function startQuiz() {
+  // hide start screen
+  var startScreenEl = document.getElementById("start-screen");
+  startScreenEl.setAttribute("class", "hide");
+
+  // un-hide questions section
+  questionsEl.removeAttribute("class");
+
+  // start timer
+  timerId = setInterval(clockTick, 1000);
+
+  // show starting time
+  timerEl.textContent = time;
+
+  getQuestion();
+}
+
+function getQuestion() {
+  // get current question object from array
+  var currentQuestion = questions[currentQuestionIndex];
+
+  // update title with current question
+  var titleEl = document.getElementById("question-title");
+  titleEl.textContent = currentQuestion.title;
+
+  // clear out any old question choices
+  choicesEl.innerHTML = "";
+
+  // loop over choices
+  currentQuestion.choices.forEach(function(choice, i) {
+    // create new button for each choice
+    var choiceNode = document.createElement("button");
+    choiceNode.setAttribute("class", "choice");
+    choiceNode.setAttribute("value", choice);
+
+    choiceNode.textContent = i + 1 + ". " + choice;
+
+    // attach click event listener to each choice
+    choiceNode.onclick = questionClick;
+
+    // display on the page
+    choicesEl.appendChild(choiceNode);
+  });
+}
+
+function questionClick() {
+  // check if user guessed wrong
+  if (this.value !== questions[currentQuestionIndex].answer) {
+    // penalize time
+    time -= 15;
+
+    if (time < 0) {
+      time = 0;
+    }
+
+    // display new time on page
+    timerEl.textContent = time;
+
+    // play "wrong" sound effect
+    sfxWrong.play();
+
+    feedbackEl.textContent = "Wrong!";
+  } else {
+    // play "right" sound effect
+    sfxRight.play();
+
+    feedbackEl.textContent = "Correct!";
   }
 
-  //checking if checked radio button is same as answer
-  options.forEach((option) => {
-      if (option.checked === true && option.value === currentQuestionAnswer) {
-          document.getElementById(correctOption).style.backgroundColor = "green"
-          playerScore++ //adding to player's score
-          indexNumber++ //adding 1 to index so has to display next question..
-          //set to delay question number till when next question loads
-          setTimeout(() => {
-              questionNumber++
-          }, 1000)
-      }
-
-      else if (option.checked && option.value !== currentQuestionAnswer) {
-          const wrongLabelId = option.labels[0].id
-          document.getElementById(wrongLabelId).style.backgroundColor = "red"
-          document.getElementById(correctOption).style.backgroundColor = "green"
-          wrongAttempt++ //adds 1 to wrong attempts 
-          indexNumber++
-          //set to delay question number till when next question loads
-          setTimeout(() => {
-              questionNumber++
-          }, 1000)
-      }
-  })
-}
-
-
-
-//called when the next button is called
-function handleNextQuestion() {
-  checkForAnswer() //check if player picked right or wrong option
-  unCheckRadioButtons()
-  //delays next question displaying for a second just for some effects so questions don't rush in on player
-  setTimeout(() => {
-      if (indexNumber <= 9) {
-//displays next question as long as index number isn't greater than 9, remember index number starts from 0, so index 9 is question 10
-          NextQuestion(indexNumber)
-      }
-      else {
-          handleEndGame()//ends game if index number greater than 9 meaning we're already at the 10th question
-      }
-      resetOptionBackground()
+  // flash right/wrong feedback on page for half a second
+  feedbackEl.setAttribute("class", "feedback");
+  setTimeout(function() {
+    feedbackEl.setAttribute("class", "feedback hide");
   }, 1000);
-}
 
-//sets options background back to null after display the right/wrong colors
-function resetOptionBackground() {
-  const options = document.getElementsByName("option");
-  options.forEach((option) => {
-      document.getElementById(option.labels[0].id).style.backgroundColor = ""
-  })
-}
+  // move to next question
+  currentQuestionIndex++;
 
-// unchecking all radio buttons for next question(can be done with map or foreach loop also)
-function unCheckRadioButtons() {
-  const options = document.getElementsByName("option");
-  for (let i = 0; i < options.length; i++) {
-      options[i].checked = false;
+  // check if we've run out of questions
+  if (currentQuestionIndex === questions.length) {
+    quizEnd();
+  } else {
+    getQuestion();
   }
 }
 
-// function for when all questions being answered
-function handleEndGame() {
-  let remark = null
-  let remarkColor = null
+function quizEnd() {
+  // stop timer
+  clearInterval(timerId);
 
-  // condition check for player remark and remark color
-  if (playerScore <= 3) {
-      remark = "Bad Grades, Keep Practicing."
-      remarkColor = "red"
-  }
-  else if (playerScore >= 4 && playerScore < 7) {
-      remark = "Average Grades, You can do better."
-      remarkColor = "orange"
-  }
-  else if (playerScore >= 7) {
-      remark = "Excellent, Keep the good work going."
-      remarkColor = "green"
-  }
-  const playerGrade = (playerScore / 10) * 100
+  // show end screen
+  var endScreenEl = document.getElementById("end-screen");
+  endScreenEl.removeAttribute("class");
 
-  //data to display to score board
-  document.getElementById('remarks').innerHTML = remark
-  document.getElementById('remarks').style.color = remarkColor
-  document.getElementById('grade-percentage').innerHTML = playerGrade
-  document.getElementById('wrong-answers').innerHTML = wrongAttempt
-  document.getElementById('right-answers').innerHTML = playerScore
-  document.getElementById('score-modal').style.display = "flex"
+  // show final score
+  var finalScoreEl = document.getElementById("final-score");
+  finalScoreEl.textContent = time;
 
+  // hide questions section
+  questionsEl.setAttribute("class", "hide");
 }
 
-//closes score modal, resets game and reshuffles questions
-function closeScoreModal() {
-  questionNumber = 1
-  playerScore = 0
-  wrongAttempt = 0
-  indexNumber = 0
-  shuffledQuestions = []
-  NextQuestion(indexNumber)
-  document.getElementById('score-modal').style.display = "none"
+function clockTick() {
+  // update time
+  time--;
+  timerEl.textContent = time;
+
+  // check if user ran out of time
+  if (time <= 0) {
+    quizEnd();
+  }
 }
 
-//function to close warning modal
-function closeOptionModal() {
-  document.getElementById('option-modal').style.display = "none"
+function saveHighscore() {
+  // get value of input box
+  var initials = initialsEl.value.trim();
+
+  // make sure value wasn't empty
+  if (initials !== "") {
+    // get saved scores from localstorage, or if not any, set to empty array
+    var highscores =
+      JSON.parse(window.localStorage.getItem("highscores")) || [];
+
+    // format new score object for current user
+    var newScore = {
+      score: time,
+      initials: initials
+    };
+
+    // save to localstorage
+    highscores.push(newScore);
+    window.localStorage.setItem("highscores", JSON.stringify(highscores));
+
+    // redirect to next page
+    window.location.href = "highscores.html";
+  }
 }
+
+function checkForEnter(event) {
+  // "13" represents the enter key
+  if (event.key === "Enter") {
+    saveHighscore();
+  }
+}
+
+// user clicks button to submit initials
+submitBtn.onclick = saveHighscore;
+
+// user clicks button to start quiz
+startBtn.onclick = startQuiz;
+
+initialsEl.onkeyup = checkForEnter;
