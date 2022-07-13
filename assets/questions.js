@@ -3,7 +3,7 @@ var questions = [
     {
       title: "What is Mario's Favorite color",
       choices: ["blue", "Red", "Yellow", "green"],
-      answer: "red"
+      answer: "Red"
     },
     {
       title: "What is Mario's favorite food",

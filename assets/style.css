@@ -14,4 +14,10 @@ padding: 10px;
 text-align: center;
 
 }
-.highscore__name-one{}
+.highscore__name-one{
+    color:cadetblue
+}
+.highscore__name-two {
+color:darkgray
+
+}
