@@ -21,3 +21,9 @@ var questions = [
       answer: "AMF"
     }
 ];
+var score = 0;
+var questionIdex = 0;
+
+var currentTime = document.querySelector("#crrentTime");
+var timer = document.querySelector("#startTime");
+var questions = document.querySelector("#questions");
