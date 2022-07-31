@@ -6,17 +6,20 @@
 }
 
 #startTime {
-background-color: purple;
-padding: 15px 32px;
-font-size: 21px;
-color: white;
+    background-color: purple;
+    padding: 15px 32px;
+    font-size: 21px;
+    color: white;
 }
+
 #questions {
     margin: 20px;
 }
+
 #currentTime {
     float: right;
 }
+
 #goBack {
     background-color: purple;
     position: relative;
@@ -26,46 +29,60 @@ color: white;
     text-align: center;
     text-decoration: none;
 }
+
 #clear {
-background-color: purple;
-position: relative;
-padding: 10px;
-font-size: 21px;
-color:white;
-text-align: center;
+    background-color: purple;
+    position: relative;
+    padding: 10px;
+    font-size: 21px;
+    color: white;
+    text-align: center;
 }
+
 button {
-border-radius: 10px;
+    border-radius: 10px;
 }
+
 textarea {
-width: 90%;
-margin: 21px;
+    width: 90%;
+    margin: 21px;
 }
+
 #submit {
     background-color: purple;
     padding: 15px 32px;
     font-size: 21px;
     color: white;
 }
+
 input {
-margin-bottom: 21px;
-width: 50%;
-border: 1px solid black;
+    margin-bottom: 21px;
+    width: 50%;
+    border: 1px solid black;
 }
+
 label {
     margin-right: 10px;
 }
+
 h1 {
     text-align: center;
 }
+
 li {
-background-color: purple;
-padding: 5px 15px;
-width: 75%;
-font-size: 21px;
-color: white;
+    background-color: purple;
+    padding: 5px 15px;
+    width: 75%;
+    font-size: 21px;
+    color: white;
 }
-@media screen and (max-width: 786px){
+
+.hide {
+    display: none;
+
+}
+
+@media screen and (max-width: 786px) {
     body {
         max-width: 786px;
     }
